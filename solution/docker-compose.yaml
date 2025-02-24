@@ -5,6 +5,8 @@ services:
     build:
       context: ./service_dds
       network: host
+      platforms:
+        - "linux/amd64"
     image: dds_service:local
     container_name: dds_service_container
     environment:
@@ -34,6 +36,8 @@ services:
     build:
       context: ./service_cdm
       network: host
+      platforms:
+        - "linux/amd64"
     image: cdm_service:local
     container_name: cdm_service_container
     environment:

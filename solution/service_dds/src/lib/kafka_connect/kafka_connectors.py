@@ -1,6 +1,4 @@
-import json
 from typing import Dict, Optional
-
 from confluent_kafka import Consumer, Producer
 
 
@@ -23,8 +21,11 @@ class KafkaProducer:
         self.topic = topic
         self.p = Producer(params)
 
-    def produce(self, payload: Dict) -> None:
-        self.p.produce(self.topic, json.dumps(payload))
+    def produce(self, payload: Optional[str]) -> None:
+        if not payload:
+            return None
+
+        self.p.produce(self.topic, payload)
         self.p.flush(10)
 
 
@@ -57,11 +58,12 @@ class KafkaConsumer:
         self.c = Consumer(params)
         self.c.subscribe([topic])
 
-    def consume(self, timeout: float = 3.0) -> Optional[Dict]:
+    def consume(self, timeout: float = 3.0) -> Optional[bytes]:
         msg = self.c.poll(timeout=timeout)
+
         if not msg:
             return None
         if msg.error():
             raise Exception(msg.error())
-        val = msg.value().decode()
-        return json.loads(val)
+
+        return msg.value()
